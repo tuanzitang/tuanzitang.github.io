@@ -2534,6 +2534,7 @@
       font-weight: 700;
     }
 
+    .card-actions,
     .inventory-card-actions {
       display: flex;
       justify-content: flex-end;
@@ -2541,6 +2542,7 @@
       margin-top: 8px;
     }
 
+    .card-actions .button,
     .inventory-card-actions .button {
       min-height: 30px;
       padding: 5px 9px;
@@ -4005,6 +4007,14 @@
       recipeEditorState.activeCard = card;
     }
 
+    function restoreRecipeEditorHome() {
+      const editor = document.getElementById("recipeEditPage");
+      const host = document.getElementById("recipeEditor");
+      if (!editor || !host) return;
+      editor.classList.remove("active", "inline-card-editor");
+      host.appendChild(editor);
+    }
+
     async function closeActiveRecipeCard() {
       if (!recipeEditorState.activeCard) return;
       const canClose = await confirmBeforeSwitch();
@@ -4014,6 +4024,7 @@
       const activeCard = recipeEditorState.activeCard;
       activeCard.classList.remove("is-editing");
       recipeEditorState.activeCard = null;
+      restoreRecipeEditorHome();
       if (activeCard.dataset.pendingRecipe === "true") {
         activeCard.remove();
       }
@@ -4388,6 +4399,9 @@
               <span class="tag">步骤 ${minutes || "未填"} 分钟</span>
               <span class="tag">${ingredients}</span>
             </div>
+            <div class="card-actions">
+              <button class="button recipe-duplicate-button" type="button" data-recipe-id="${escapeAttr(recipe.id)}">复制</button>
+            </div>
           </div>
         </article>
       `;
@@ -4531,6 +4545,51 @@
       bindDynamicRecipeCards(document.getElementById("recipeLibraryGrid"));
     }
 
+    function cloneData(value) {
+      return JSON.parse(JSON.stringify(value || {}));
+    }
+
+    function copyName(baseName = "未命名", existingNames = []) {
+      const cleanName = String(baseName || "未命名").replace(/\s+副本(?:\s+\d+)?$/, "");
+      const names = new Set(existingNames);
+      let nextName = `${cleanName} 副本`;
+      let index = 2;
+      while (names.has(nextName)) {
+        nextName = `${cleanName} 副本 ${index}`;
+        index += 1;
+      }
+      return nextName;
+    }
+
+    async function duplicateRecipe(id) {
+      const canSwitch = await confirmBeforeSwitch();
+      if (!canSwitch) return;
+      if (recipeEditorState.activeCard) {
+        recipeEditorState.activeCard.classList.remove("is-editing");
+        restoreRecipeEditorHome();
+        recipeEditorState.activeCard = null;
+      }
+      const recipes = await getAll("recipes");
+      const source = recipes.find((recipe) => recipe.id === id);
+      if (!source) return;
+      const duplicate = {
+        ...cloneData(source),
+        id: `recipe-${Date.now()}`,
+        name: copyName(source.name || "未命名食谱", recipes.map((recipe) => recipe.name)),
+        lastCookedAt: null
+      };
+      await saveRecords("recipes", [duplicate]);
+      await renderRecipeLibrary();
+      await renderHomeRecommendations();
+      const newCard = [...document.querySelectorAll("#recipeLibraryGrid .library-card")]
+        .find((card) => card.dataset.recipeId === duplicate.id);
+      if (newCard) {
+        setRecipeForm(duplicate);
+        attachEditorToCard(newCard);
+      }
+      await updateStorageStatus(`已复制食谱“${source.name}”，新食谱为“${duplicate.name}”。`);
+    }
+
     function inferInventoryType(item = {}) {
       if (item.type) return item.type;
       const name = item.name || "";
@@ -4613,6 +4672,7 @@
               <span class="tag">${item.pantry ? "常备" : "新鲜库存"}</span>
             </div>
             <div class="inventory-card-actions">
+              <button class="button inventory-duplicate-button" type="button" data-inventory-id="${escapeAttr(item.id)}">复制</button>
               <button class="button inventory-delete-button" type="button" data-inventory-id="${escapeAttr(item.id)}">删除</button>
             </div>
           </div>
@@ -4684,6 +4744,10 @@
           event.stopPropagation();
           deleteInventoryItem(card.dataset.inventoryId).catch(showStorageError);
         });
+        card.querySelector(".inventory-duplicate-button")?.addEventListener("click", (event) => {
+          event.stopPropagation();
+          duplicateInventoryItem(card.dataset.inventoryId).catch(showStorageError);
+        });
       });
     }
 
@@ -4739,6 +4803,26 @@
       await renderInventoryLibrary();
       await renderHomeRecommendations();
       await updateStorageStatus(`已删除食材“${item.name}”。`);
+    }
+
+    async function duplicateInventoryItem(id) {
+      const inventory = await getAll("inventory");
+      const source = inventory.find((entry) => entry.id === id);
+      if (!source) return;
+      const duplicate = {
+        ...cloneData(source),
+        id: `item-${Date.now()}`,
+        name: copyName(source.name || "未命名食材", inventory.map((item) => item.name))
+      };
+      await saveRecords("inventory", [duplicate]);
+      await renderInventoryLibrary();
+      await renderHomeRecommendations();
+      const newCard = [...document.querySelectorAll("#inventoryLibraryGrid .inventory-card")]
+        .find((card) => card.dataset.inventoryId === duplicate.id);
+      if (newCard) {
+        editInventoryCard(newCard).catch(showStorageError);
+      }
+      await updateStorageStatus(`已复制食材“${source.name}”，新库存为“${duplicate.name}”。`);
     }
 
     function plannedRecipeNames(plans = []) {
@@ -5822,6 +5906,7 @@
         const canSwitch = await confirmBeforeSwitch();
         if (!canSwitch) return;
         recipeEditorState.activeCard.classList.remove("is-editing");
+        restoreRecipeEditorHome();
         if (recipeEditorState.activeCard.dataset.pendingRecipe === "true") {
           recipeEditorState.activeCard.remove();
         }
@@ -5859,6 +5944,10 @@
 
     function bindDynamicRecipeCards(scope) {
       scope.querySelectorAll(".featured-recipe-details").forEach((card) => {
+        card.querySelector(".recipe-duplicate-button")?.addEventListener("click", (event) => {
+          event.stopPropagation();
+          duplicateRecipe(card.dataset.recipeId).catch(showStorageError);
+        });
         card.addEventListener("click", (event) => {
           if (event?.target?.closest?.("#recipeEditPage")) return;
           window.openFeaturedRecipeCard(card, event);
