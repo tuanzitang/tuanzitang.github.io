@@ -1196,6 +1196,69 @@
       font-size: 15px;
     }
 
+    .recipe-edit-page:not(.is-browse-mode) .editor-shell {
+      gap: 10px;
+      background: #fff;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .editor-section {
+      padding: 8px 2px;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .edit-only-section + .edit-only-section {
+      padding-top: 0;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .name-status-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .recipe-name-input {
+      min-height: 40px;
+      padding: 4px 0 6px;
+      border: 0;
+      border-bottom: 1px solid rgba(116, 160, 196, 0.28);
+      border-radius: 0;
+      background: transparent;
+      font-size: 20px;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .form-field {
+      gap: 4px;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .form-field label {
+      font-size: 11px;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .editor-meta-grid {
+      grid-template-columns: minmax(180px, 1.2fr) auto auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .status-options.editor-status .chip {
+      min-height: 26px;
+      padding: 4px 8px;
+      font-size: 12px;
+      box-shadow: none;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .likes-strip {
+      gap: 11px;
+    }
+
+    .recipe-edit-page:not(.is-browse-mode) .like-pill .star {
+      font-size: 15px;
+    }
+
     .editor-section-title .tiny {
       margin: 0;
     }
@@ -1323,6 +1386,193 @@
       margin-bottom: 8px;
     }
 
+    .browse-summary {
+      display: none;
+      padding: 6px 2px 2px;
+      gap: 5px;
+      border: 0;
+      background: transparent;
+    }
+
+    .recipe-edit-page.is-browse-mode .browse-summary {
+      display: grid;
+    }
+
+    .recipe-edit-page.is-browse-mode .edit-only-section {
+      display: none;
+    }
+
+    .browse-title-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .browse-title-row h3 {
+      margin: 0;
+      color: var(--ink);
+      font-size: 19px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .browse-meta-row,
+    .browse-like-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .browse-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      min-height: 0;
+      padding: 0;
+      border-radius: 0;
+      background: transparent;
+      color: #526b7e;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .browse-pill.primary {
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #edf6fc;
+      color: var(--blue-dark);
+    }
+
+    .browse-like-row span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .recipe-edit-page.is-browse-mode .amount-tools {
+      display: none;
+    }
+
+    .recipe-edit-page.is-browse-mode #saveRecipeButton,
+    .recipe-edit-page.is-browse-mode .editor-title p {
+      display: none;
+    }
+
+    .recipe-edit-page.is-browse-mode .editor-section-title {
+      margin-bottom: 2px;
+      padding-inline: 2px;
+    }
+
+    .recipe-edit-page.is-browse-mode .editor-section {
+      padding: 8px 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .recipe-edit-page.is-browse-mode #measureTable {
+      display: none;
+    }
+
+    .recipe-edit-page.is-browse-mode .step-card {
+      padding: 8px 2px 7px;
+      border: 0;
+      border-top: 1px solid rgba(116, 160, 196, 0.12);
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .recipe-edit-page.is-browse-mode .step-card:first-child {
+      border-top: 0;
+    }
+
+    .browse-step-head {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+
+    .browse-step-index {
+      color: #8fa3b4;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .browse-step-head strong {
+      color: var(--ink);
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .browse-step-head span {
+      flex: 0 0 auto;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .browse-materials {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 6px;
+      padding-left: 23px;
+    }
+
+    .browse-material-row {
+      display: inline-flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+      min-height: 22px;
+      padding: 2px 7px;
+      border-top: 0;
+      border-radius: 999px;
+      background: #f8fbfd;
+      color: #4c6375;
+      font-size: 12px;
+    }
+
+    .browse-material-row.has-next {
+      border-radius: 10px;
+    }
+
+    .browse-material-row:first-child {
+      border-top: 0;
+    }
+
+    .browse-material-row strong {
+      color: var(--ink);
+      font-size: 13px;
+    }
+
+    .browse-material-kind {
+      display: inline-flex;
+      margin-right: 5px;
+      padding: 0;
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 400;
+    }
+
+    .browse-material-next {
+      color: #7a8fa0;
+    }
+
+    .browse-material-row .amount-dual {
+      gap: 3px;
+    }
+
+    .browse-material-row .amount-dual small {
+      color: #a2b1be;
+    }
+
     .form-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1391,10 +1641,12 @@
     .step-add-measure {
       display: grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
-      gap: 8px;
-      margin-top: 8px;
-      padding: 0;
-      background: transparent;
+      gap: 6px;
+      margin-top: 6px;
+      margin-left: 23px;
+      padding: 8px;
+      background: #f8fbfd;
+      border-radius: 10px;
     }
 
     .step-add-measure:not(.is-open) {
@@ -1419,15 +1671,15 @@
     .add-measure-grid > :nth-child(1),
     .add-measure-grid > :nth-child(3),
     .add-measure-grid > :nth-child(7) {
-      border-radius: 12px;
-      background: #edf7ff;
-      border-color: #d6e9f8;
+      border-radius: 9px;
+      background: #fff;
+      border-color: rgba(116, 160, 196, 0.24);
     }
 
     .add-measure-grid > :nth-child(2),
     .add-measure-grid > :nth-child(4),
     .add-measure-grid > :nth-child(8) {
-      border-radius: 12px;
+      border-radius: 9px;
       background: #fff;
       border-color: rgba(116, 160, 196, 0.24);
     }
@@ -1439,27 +1691,31 @@
     .step-card {
       display: grid;
       gap: 8px;
-      padding: 12px;
-      border: 1px solid rgba(116, 160, 196, 0.16);
-      border-radius: 12px;
-      background: #f8fbfd;
+      padding: 10px 2px;
+      border: 0;
+      border-top: 1px solid rgba(116, 160, 196, 0.12);
+      border-radius: 0;
+      background: transparent;
     }
 
     .step-card-head {
-      display: flex;
-      gap: 8px;
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) 72px auto auto;
+      gap: 7px;
       align-items: center;
-      flex-wrap: nowrap;
       min-width: 0;
     }
 
     .step-card-head > input:first-child {
-      flex: 1 1 220px;
       min-width: 140px;
     }
 
     .step-card-head > input[type="number"] {
-      flex: 0 0 72px;
+      min-width: 0;
+    }
+
+    .step-card-head .browse-step-index {
+      align-self: center;
     }
 
     .minute-label {
@@ -1562,15 +1818,16 @@
 
     .step-materials {
       display: grid;
-      gap: 6px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(116, 160, 196, 0.14);
+      gap: 5px;
+      padding-top: 4px;
+      padding-left: 23px;
+      border-top: 0;
     }
 
     .step-material-row {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px;
+      grid-template-columns: minmax(110px, 1fr) minmax(140px, auto) minmax(190px, auto);
+      gap: 6px;
       align-items: center;
       color: var(--muted);
       font-size: 12px;
@@ -1601,11 +1858,12 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      justify-content: center;
+      justify-content: flex-start;
       min-height: 28px;
-      padding: 5px 7px;
-      border: 1px solid;
-      border-radius: 8px;
+      padding: 3px 7px;
+      border: 0;
+      border-radius: 999px;
+      background: #f8fbfd;
     }
 
     .amount-dual {
@@ -1623,7 +1881,7 @@
 
     .step-material-row .current-cell,
     .step-material-row .next-cell {
-      min-height: 38px;
+      min-height: 30px;
     }
 
     .step-next-edit input,
@@ -2173,7 +2431,7 @@
 
     .recipe-list-tools {
       display: grid;
-      grid-template-columns: minmax(160px, 1fr) auto auto 118px;
+      grid-template-columns: minmax(160px, 1fr) auto minmax(116px, auto) 118px;
       gap: 10px;
       align-items: center;
       padding: 12px;
@@ -2191,6 +2449,78 @@
       padding: 8px 10px;
       font: inherit;
       background: #fff;
+    }
+
+    .multi-select-filter {
+      position: relative;
+      min-width: 116px;
+    }
+
+    .multi-select-filter summary {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid rgba(116, 160, 196, 0.24);
+      border-radius: 9px;
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      list-style: none;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .multi-select-filter summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .multi-select-filter summary::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-right: 1.5px solid #6f899c;
+      border-bottom: 1.5px solid #6f899c;
+      transform: rotate(45deg) translateY(-2px);
+      flex: 0 0 auto;
+    }
+
+    .multi-select-filter[open] summary::after {
+      transform: rotate(225deg) translateY(-1px);
+    }
+
+    .multi-select-menu {
+      position: absolute;
+      z-index: 20;
+      top: calc(100% + 6px);
+      right: 0;
+      display: grid;
+      gap: 4px;
+      min-width: 138px;
+      padding: 7px;
+      border: 1px solid rgba(116, 160, 196, 0.22);
+      border-radius: 10px;
+      background: #fff;
+      box-shadow: 0 12px 28px rgba(75, 104, 126, 0.15);
+    }
+
+    .multi-select-menu label {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 30px;
+      padding: 4px 6px;
+      border-radius: 8px;
+      color: #526b7e;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .multi-select-menu label:hover {
+      background: #f4f9fd;
     }
 
     .quick-add-panel {
@@ -2669,7 +2999,7 @@
       }
 
       .recipe-list-tools {
-        grid-template-columns: minmax(0, 1fr) auto auto minmax(88px, auto);
+        grid-template-columns: minmax(0, 1fr) auto minmax(104px, auto) minmax(88px, auto);
       }
 
       .inventory-list-tools {
@@ -2799,13 +3129,19 @@
       <div class="recipe-list-tools">
         <input id="recipeSearchInput" type="search" placeholder="搜索菜名">
         <label class="filter-check"><input id="inventoryFilterInput" type="checkbox"> 可做</label>
-        <label class="filter-check"><input id="successFilterInput" type="checkbox"> 已成功</label>
+        <details class="multi-select-filter" id="recipeStatusFilter">
+          <summary id="recipeStatusFilterLabel">状态</summary>
+          <div class="multi-select-menu">
+            <label><input class="recipe-status-filter-input" type="checkbox" value="已成功"> 已成功</label>
+            <label><input class="recipe-status-filter-input" type="checkbox" value="改进中"> 改进中</label>
+            <label><input class="recipe-status-filter-input" type="checkbox" value="未尝试"> 未尝试</label>
+          </div>
+        </details>
         <select id="timeFilterSelect" aria-label="按用时筛选">
-          <option value="all">用时</option>
+          <option value="all">不限</option>
           <option value="15">15 分钟内</option>
           <option value="30">30 分钟内</option>
-          <option value="45">45 分钟内</option>
-          <option value="60">60 分钟内</option>
+          <option value="60">1 小时内</option>
         </select>
       </div>
       <div class="recipe-list-grid" id="recipeLibraryGrid"></div>
@@ -3015,12 +3351,15 @@
               <p>改动会先留在当前编辑页，保存后写入本地数据。</p>
             </div>
             <div class="segmented">
+              <button class="button" id="toggleRecipeEditModeButton" type="button">编辑</button>
               <button class="button primary" id="saveRecipeButton" type="button">✓ 保存</button>
               <button class="button" id="closeRecipeEditorButton" type="button">× 收起</button>
             </div>
           </div>
 
-          <section class="editor-section compact">
+          <section class="editor-section browse-summary" id="recipeBrowseSummary"></section>
+
+          <section class="editor-section compact edit-only-section">
             <div class="name-status-row">
               <div class="form-field">
                 <label for="recipeName">菜名</label>
@@ -3037,7 +3376,7 @@
             </div>
           </section>
 
-          <section class="editor-section compact">
+          <section class="editor-section compact edit-only-section">
             <div class="editor-meta-grid">
               <div class="form-field">
                 <label>家庭喜好</label>
@@ -3970,6 +4309,7 @@
       measurements: [],
       steps: [],
       stepEditMode: false,
+      editMode: false,
       activeCard: null,
       dirty: false
     };
@@ -3996,6 +4336,67 @@
 
     function markEditorDirty() {
       recipeEditorState.dirty = true;
+    }
+
+    function setRecipeEditMode(enabled) {
+      recipeEditorState.editMode = Boolean(enabled);
+      if (!recipeEditorState.editMode) {
+        recipeEditorState.stepEditMode = false;
+        recipeEditorState.measurements.forEach((measure) => {
+          measure.editing = false;
+        });
+      }
+      renderMeasurements();
+      renderSteps();
+      applyRecipeEditMode();
+    }
+
+    function applyRecipeEditMode() {
+      const editable = recipeEditorState.editMode;
+      const page = document.getElementById("recipeEditPage");
+      if (!page) return;
+      page.classList.toggle("is-browse-mode", !editable);
+      renderRecipeBrowseSummary();
+      page.querySelector(".editor-title h4").textContent = editable ? "食谱编辑" : "食谱详情";
+      document.getElementById("recipeName").disabled = !editable;
+      document.getElementById("saveRecipeButton").disabled = !editable;
+      document.getElementById("toggleRecipeEditModeButton").textContent = editable ? "浏览" : "编辑";
+      const name = document.getElementById("recipeName").value || "未命名食谱";
+      document.getElementById("recipeEditorStatus").textContent = editable ? `正在编辑：${name}` : `正在查看：${name}`;
+      document.querySelectorAll("#recipeStatusOptions button, #bestMealOptions button, #bestPeopleOptions button").forEach((button) => {
+        button.disabled = !editable;
+      });
+      document.getElementById("amountMultiplierInput").disabled = !editable;
+      document.getElementById("applyAmountMultiplierButton").disabled = !editable;
+      document.getElementById("toggleStepEditButton").disabled = !editable;
+    }
+
+    function renderRecipeBrowseSummary() {
+      const summary = document.getElementById("recipeBrowseSummary");
+      if (!summary) return;
+      const name = document.getElementById("recipeName")?.value || "未命名食谱";
+      const status = getRecipeStatus();
+      const totalMinutes = recipeEditorState.steps.reduce((sum, step) => sum + (Number(step.minutes) || 0), 0);
+      const likes = FAMILY_MEMBERS.map((member) => {
+        const rating = Number(document.getElementById(member.id)?.dataset.rating || 3);
+        return `<span>${member.name} <strong class="homepage-stars">${fiveStars(rating)}</strong></span>`;
+      }).join("");
+      summary.innerHTML = `
+        <div class="browse-title-row">
+          <h3>${escapeAttr(name)}</h3>
+          <span class="browse-pill primary">${escapeAttr(status)}</span>
+        </div>
+        <div class="browse-meta-row">
+          <span class="browse-pill">${escapeAttr(getBestMeal())}</span>
+          <span>·</span>
+          <span class="browse-pill">${escapeAttr(getBestPeople())} 人</span>
+          <span>·</span>
+          <span class="browse-pill">${totalMinutes || "未填"} 分钟</span>
+          <span>·</span>
+          <span class="browse-pill">${recipeEditorState.measurements.length} 项食材</span>
+        </div>
+        <div class="browse-like-row">${likes}</div>
+      `;
     }
 
     function isEnterSubmit(event) {
@@ -4235,6 +4636,20 @@
       return `<span class="amount-dual"><span>${primary}</span><small>/</small><span>${secondary}</span></span>`;
     }
 
+    function amountPairKey(measure, scope = "current") {
+      const weightValue = scope === "next" ? measure.nextWeightValue : measure.weightValue;
+      const weightUnit = scope === "next" ? measure.nextWeightUnit : measure.weightUnit;
+      const spoonValue = scope === "next" ? measure.nextSpoonValue : measure.spoonValue;
+      const spoonUnit = scope === "next" ? measure.nextSpoonUnit : measure.spoonUnit;
+      return [
+        String(weightValue || ""),
+        String(weightUnit || "克"),
+        String(spoonValue || ""),
+        String(spoonUnit || "小勺"),
+        String(measure.preferred || "重量")
+      ].join("|");
+    }
+
     function syncPairedAmount(measure, field) {
       if (field === "nextWeightValue" || field === "nextWeightUnit") {
         if (isCountUnit(measure.nextWeightUnit)) {
@@ -4407,6 +4822,7 @@
             </div>
             <div class="card-actions">
               <button class="button recipe-duplicate-button" type="button" data-recipe-id="${escapeAttr(recipe.id)}">复制</button>
+              <button class="button recipe-delete-button" type="button" data-recipe-id="${escapeAttr(recipe.id)}">删除</button>
             </div>
           </div>
         </article>
@@ -4480,6 +4896,20 @@
       `;
     }
 
+    function selectedRecipeStatuses() {
+      return [...document.querySelectorAll(".recipe-status-filter-input:checked")]
+        .map((input) => input.value);
+    }
+
+    function updateRecipeStatusFilterLabel() {
+      const selected = selectedRecipeStatuses();
+      const label = document.getElementById("recipeStatusFilterLabel");
+      if (!label) return;
+      if (!selected.length) label.textContent = "状态";
+      else if (selected.length === 1) label.textContent = selected[0];
+      else label.textContent = `状态 ${selected.length}`;
+    }
+
     async function renderHomeRecommendations() {
       const grid = document.getElementById("homeRecipeGrid");
       if (!grid) return;
@@ -4532,15 +4962,15 @@
       const [recipes, inventory] = await Promise.all([getAll("recipes"), getAll("inventory")]);
       const query = document.getElementById("recipeSearchInput").value.trim().toLowerCase();
       const onlyInventory = document.getElementById("inventoryFilterInput").checked;
-      const onlySuccess = document.getElementById("successFilterInput").checked;
       const maxMinutes = document.getElementById("timeFilterSelect").value;
+      const selectedStatuses = selectedRecipeStatuses();
       const filtered = recipes.filter((recipe) => {
         const matchesName = !query || (recipe.name || "").toLowerCase().includes(query);
         const matchesInventory = !onlyInventory || canCookWithInventory(recipe, inventory);
-        const matchesSuccess = !onlySuccess || recipe.status === "已成功";
+        const matchesStatus = !selectedStatuses.length || selectedStatuses.includes(recipe.status || "未尝试");
         const minutes = recipeTotalMinutes(recipe);
         const matchesTime = maxMinutes === "all" || (minutes > 0 && minutes <= Number(maxMinutes));
-        return matchesName && matchesInventory && matchesSuccess && matchesTime;
+        return matchesName && matchesInventory && matchesStatus && matchesTime;
       });
       const cookableCount = recipes.filter((recipe) => canCookWithInventory(recipe, inventory)).length;
       document.getElementById("recipeListCount").textContent = `可做 ${cookableCount} 道，食谱库 ${recipes.length} 道。`;
@@ -4590,10 +5020,40 @@
       const newCard = [...document.querySelectorAll("#recipeLibraryGrid .library-card")]
         .find((card) => card.dataset.recipeId === duplicate.id);
       if (newCard) {
-        setRecipeForm(duplicate);
+        setRecipeForm(duplicate, { editMode: true });
         attachEditorToCard(newCard);
       }
       await updateStorageStatus(`已复制食谱“${source.name}”，新食谱为“${duplicate.name}”。`);
+    }
+
+    async function deleteRecipe(id) {
+      const recipes = await getAll("recipes");
+      const recipe = recipes.find((item) => item.id === id);
+      if (!recipe) return;
+      if (!confirm(`确定删除食谱“${recipe.name}”吗？本机食谱库和菜单里的同名安排都会移除。`)) return;
+      if (recipeEditorState.activeCard?.dataset.recipeId === id) {
+        restoreRecipeEditorHome();
+        recipeEditorState.activeCard.classList.remove("is-editing");
+        recipeEditorState.activeCard = null;
+      }
+      await deleteRecord("recipes", id);
+      const plans = await getAll("plans");
+      const updatedPlans = plans.map((plan) => {
+        const meals = cloneData(plan.meals || {});
+        Object.values(meals).forEach((dayMeals) => {
+          Object.keys(dayMeals || {}).forEach((mealName) => {
+            const dishes = Array.isArray(dayMeals[mealName]) ? dayMeals[mealName].filter((dish) => dish.name !== recipe.name) : [];
+            dayMeals[mealName] = dishes.length ? dishes : null;
+          });
+        });
+        return { ...plan, meals };
+      });
+      if (updatedPlans.length) await saveRecords("plans", updatedPlans);
+      await renderRecipeLibrary();
+      await renderHomeRecommendations();
+      await renderShoppingList();
+      await renderReminderList();
+      await updateStorageStatus(`已删除食谱“${recipe.name}”。`);
     }
 
     function inferInventoryType(item = {}) {
@@ -6029,7 +6489,7 @@
         measurements: [],
         steps: [],
         attempts: []
-      });
+      }, { editMode: true });
       attachEditorToCard(card);
       document.getElementById("recipeName").focus();
     }
@@ -6040,12 +6500,18 @@
           event.stopPropagation();
           duplicateRecipe(card.dataset.recipeId).catch(showStorageError);
         });
+        card.querySelector(".recipe-delete-button")?.addEventListener("click", (event) => {
+          event.stopPropagation();
+          deleteRecipe(card.dataset.recipeId).catch(showStorageError);
+        });
         card.addEventListener("click", (event) => {
           if (event?.target?.closest?.("#recipeEditPage")) return;
+          if (event?.target?.closest?.("button")) return;
           window.openFeaturedRecipeCard(card, event);
         });
         card.addEventListener("dblclick", (event) => {
           if (event?.target?.closest?.("#recipeEditPage")) return;
+          if (event?.target?.closest?.("button")) return;
           event.preventDefault();
           if (recipeEditorState.activeCard === card) return;
           window.openFeaturedRecipeCard(card, event);
@@ -6181,13 +6647,15 @@
       };
     }
 
-    function setRecipeForm(recipe) {
+    function setRecipeForm(recipe, options = {}) {
       recipeEditorState.currentRecipeId = recipe.id;
       recipeEditorState.currentLastCookedAt = recipe.lastCookedAt || null;
       recipeEditorState.measurements = Array.isArray(recipe.measurements)
         ? recipe.measurements.map(normalizeMeasurement)
         : measurementsFromServings(recipe.servings);
       recipeEditorState.steps = Array.isArray(recipe.steps) ? recipe.steps : [];
+      recipeEditorState.stepEditMode = false;
+      recipeEditorState.editMode = Boolean(options.editMode);
       document.getElementById("recipeName").value = recipe.name || "";
       setRecipeStatus(recipe.status || "未尝试");
       setMealPriority(recipe.mealPriority || []);
@@ -6196,8 +6664,11 @@
       FAMILY_MEMBERS.forEach((member) => setRating(member.id, ratingToNumber(memberLikeValue(recipe.memberLikes, member))));
       renderMeasurements();
       renderSteps();
-      document.getElementById("recipeEditorStatus").textContent = `正在编辑：${recipe.name || "未命名食谱"}`;
+      document.getElementById("recipeEditorStatus").textContent = recipeEditorState.editMode
+        ? `正在编辑：${recipe.name || "未命名食谱"}`
+        : `正在查看：${recipe.name || "未命名食谱"}`;
       recipeEditorState.dirty = false;
+      applyRecipeEditMode();
     }
 
     function measurementsFromServings(servings = {}) {
@@ -6232,8 +6703,8 @@
         const measure = normalizeMeasurement(item);
         const row = document.createElement("div");
         row.className = "measure-row material-row";
-        const disabled = measure.editing ? "" : "disabled";
-        const nextDisabled = "";
+        const disabled = recipeEditorState.editMode && measure.editing ? "" : "disabled";
+        const nextDisabled = recipeEditorState.editMode ? "" : "disabled";
         const weightDefault = measure.preferred === "重量" ? " default-cell" : "";
         const spoonDefault = measure.preferred === "勺数" ? " default-cell" : "";
         row.innerHTML = `
@@ -6270,7 +6741,7 @@
             <option ${measure.preferred === "重量" ? "selected" : ""}>重量</option>
             <option ${measure.preferred === "勺数" ? "selected" : ""}>勺数</option>
           </select>
-          <button class="button" type="button">${measure.editing ? "完成" : "编辑"}</button>
+          <button class="button" type="button" ${recipeEditorState.editMode ? "" : "disabled"}>${measure.editing ? "完成" : "编辑"}</button>
         `;
         recipeEditorState.measurements[index] = measure;
         const [ingredientInput, kindSelect, weightInput, weightUnitSelect, spoonInput, spoonUnitSelect, nextWeightInput, nextWeightUnitSelect, nextSpoonInput, nextSpoonUnitSelect, preferredSelect] = row.querySelectorAll("input, select");
@@ -6322,6 +6793,7 @@
           });
         });
         row.querySelector("button").addEventListener("click", () => {
+          if (!recipeEditorState.editMode) return;
           measure.editing = !measure.editing;
           renderMeasurements();
         });
@@ -6353,8 +6825,20 @@
 
     function renderStepMaterials(stepIndex) {
       const materials = measurementsForStep(stepIndex);
-      if (!materials.length) return `<p class="tiny">这个步骤还没有分配材料。</p>`;
+      if (!materials.length) return recipeEditorState.editMode ? `<p class="tiny">这个步骤还没有分配材料。</p>` : "";
       return materials.map(({ measure, index }) => {
+        if (!recipeEditorState.editMode) {
+          const currentAmount = amountPairText(measure, "current");
+          const nextAmount = amountPairText(measure, "next");
+          const showNext = amountPairKey(measure, "current") !== amountPairKey(measure, "next");
+          return `
+            <div class="browse-material-row${showNext ? " has-next" : ""}">
+              <span><span class="browse-material-kind">${escapeAttr(measure.kind || "必要")}</span><strong>${escapeAttr(measure.ingredient || "未命名食材")}</strong></span>
+              <span>${currentAmount}</span>
+              ${showNext ? `<span class="browse-material-next">下次 ${nextAmount}</span>` : ""}
+            </div>
+          `;
+        }
         const useSpoon = measure.preferred === "勺数";
         const nextValue = useSpoon ? measure.nextSpoonValue || "" : measure.nextWeightValue || "";
         const nextUnit = useSpoon ? normalizeSpoonUnit(measure.nextSpoonUnit || "小勺") : measure.nextWeightUnit || "克";
@@ -6462,9 +6946,10 @@
       recipeEditorState.steps.forEach((step, index) => {
         const row = document.createElement("div");
         row.className = "step-card";
-        const disabled = recipeEditorState.stepEditMode ? "" : "disabled";
-        row.innerHTML = `
+        const disabled = recipeEditorState.editMode && recipeEditorState.stepEditMode ? "" : "disabled";
+        row.innerHTML = recipeEditorState.editMode ? `
           <div class="step-card-head">
+            <span class="browse-step-index">${index + 1}</span>
             <input value="${step.text || stepLabel(index)}" aria-label="${stepLabel(index)} 名字" ${disabled}>
             <input value="${step.minutes || 0}" type="number" min="0" aria-label="分钟" ${disabled}>
             <span class="minute-label">分钟</span>
@@ -6481,10 +6966,19 @@
             ${renderStepMaterials(index)}
           </div>
           ${renderStepAddMeasure(index)}
+        ` : `
+          <div class="browse-step-head">
+            <span class="browse-step-index">${index + 1}</span>
+            <strong>${escapeAttr(step.text || stepLabel(index))}</strong>
+            <span>${Number(step.minutes) || 0} 分钟</span>
+          </div>
+          <div class="browse-materials">
+            ${renderStepMaterials(index)}
+          </div>
         `;
         const [textInput, minutesInput] = row.querySelectorAll(".step-card-head input");
-        textInput.addEventListener("input", () => { step.text = textInput.value; markEditorDirty(); });
-        minutesInput.addEventListener("input", () => { step.minutes = Number(minutesInput.value) || 0; markEditorDirty(); });
+        textInput?.addEventListener("input", () => { step.text = textInput.value; markEditorDirty(); });
+        minutesInput?.addEventListener("input", () => { step.minutes = Number(minutesInput.value) || 0; markEditorDirty(); });
         row.querySelectorAll(".step-next-edit input, .step-next-edit select").forEach((control) => {
           control.addEventListener("input", () => {
             const measure = recipeEditorState.measurements[Number(control.dataset.materialIndex)];
@@ -6529,8 +7023,9 @@
         bindStepAddMeasure(row);
         table.appendChild(row);
       });
-      document.getElementById("stepEditorFields").classList.toggle("active", recipeEditorState.stepEditMode);
+      document.getElementById("stepEditorFields").classList.toggle("active", recipeEditorState.editMode && recipeEditorState.stepEditMode);
       document.getElementById("toggleStepEditButton").textContent = recipeEditorState.stepEditMode ? "完成步骤编辑" : "编辑步骤";
+      applyRecipeEditMode();
     }
 
     function renderAttempts(attempts) {
@@ -6605,6 +7100,11 @@
           <div class="feedback"></div>
           <div class="tags"><span class="tag">新保存</span><span class="tag">步骤 ${minutes || "未填"} 分钟</span><span class="tag">${recipeIngredients(recipe).join("，") || "食材待补充"}</span></div>
         `;
+      }
+      if (recipeEditorState.activeCard) {
+        recipeEditorState.activeCard.classList.remove("is-editing");
+        restoreRecipeEditorHome();
+        recipeEditorState.activeCard = null;
       }
       await renderEditableRecipes();
       await renderRecipeLibrary();
@@ -6813,9 +7313,15 @@
       document.getElementById("quickInventoryExpiresAt").addEventListener("input", (event) => {
         document.getElementById("quickInventoryExpireDays").value = daysFromDate(event.target.value) || "0";
       });
-      ["recipeSearchInput", "inventoryFilterInput", "successFilterInput", "timeFilterSelect"].forEach((id) => {
+      ["recipeSearchInput", "inventoryFilterInput", "timeFilterSelect"].forEach((id) => {
         const eventName = id === "recipeSearchInput" ? "input" : "change";
         document.getElementById(id).addEventListener(eventName, () => renderRecipeLibrary().catch(showStorageError));
+      });
+      document.querySelectorAll(".recipe-status-filter-input").forEach((input) => {
+        input.addEventListener("change", () => {
+          updateRecipeStatusFilterLabel();
+          renderRecipeLibrary().catch(showStorageError);
+        });
       });
       ["inventorySearchInput", "inventoryTypeFilter", "inventoryStorageFilter"].forEach((id) => {
         const eventName = id === "inventorySearchInput" ? "input" : "change";
@@ -6836,6 +7342,9 @@
       document.getElementById("openBulkImportButton").addEventListener("click", () => document.getElementById("bulkImportText").focus());
       document.getElementById("recipeEditPage").addEventListener("click", (event) => event.stopPropagation());
       document.getElementById("closeRecipeEditorButton").addEventListener("click", () => closeActiveRecipeCard());
+      document.getElementById("toggleRecipeEditModeButton").addEventListener("click", () => {
+        setRecipeEditMode(!recipeEditorState.editMode);
+      });
       document.querySelectorAll("#recipeStatusOptions .chip").forEach((button) => {
         button.addEventListener("click", () => { setRecipeStatus(button.dataset.status); markEditorDirty(); });
       });
@@ -6856,6 +7365,7 @@
       document.getElementById("addStepButton").addEventListener("click", addEditorStepFromFields);
       document.getElementById("recipeEditPage").addEventListener("keydown", (event) => {
         if (!isEnterSubmit(event)) return;
+        if (!recipeEditorState.editMode) return;
         event.preventDefault();
         if (event.target.closest("#stepEditorFields") && addEditorStepFromFields()) return;
         saveCurrentRecipe().catch(showStorageError);
@@ -6881,18 +7391,28 @@
 
     window.openFeaturedRecipeCard = async function(card, event) {
       if (event?.target?.closest?.("#recipeEditPage")) return;
-      if (recipeEditorState.activeCard === card) {
+      if (event?.target?.closest?.("button")) return;
+      let targetCard = card;
+      if (recipeEditorState.activeCard === targetCard) {
         await closeActiveRecipeCard();
         return;
       }
-      if (recipeEditorState.activeCard && recipeEditorState.activeCard !== card) {
+      if (recipeEditorState.activeCard && recipeEditorState.activeCard !== targetCard) {
+        const previousCard = recipeEditorState.activeCard;
         const canSwitch = await confirmBeforeSwitch();
         if (!canSwitch) return;
-        recipeEditorState.activeCard.classList.remove("is-editing");
+        previousCard.classList.remove("is-editing");
+        if (recipeEditorState.activeCard === previousCard) {
+          restoreRecipeEditorHome();
+          recipeEditorState.activeCard = null;
+        }
+        if (!document.body.contains(targetCard)) {
+          targetCard = document.querySelector(`[data-recipe-id="${CSS.escape(card.dataset.recipeId || "")}"]`) || card;
+        }
       }
       const fallbackRecipe = {
-        id: card.dataset.recipeId || `recipe-${Date.now()}`,
-        name: card.dataset.recipeName || "未命名食谱",
+        id: targetCard.dataset.recipeId || `recipe-${Date.now()}`,
+        name: targetCard.dataset.recipeName || "未命名食谱",
         status: "未尝试",
         mealPriority: ["晚餐"],
         memberLikes: defaultMemberLikes(),
@@ -6905,11 +7425,11 @@
       };
       try {
         const recipes = await getAll("recipes");
-        const recipe = recipes.find((item) => item.id === card.dataset.recipeId) || recipes.find((item) => item.name === card.dataset.recipeName) || fallbackRecipe;
+        const recipe = recipes.find((item) => item.id === targetCard.dataset.recipeId) || recipes.find((item) => item.name === targetCard.dataset.recipeName) || fallbackRecipe;
         setRecipeForm(recipe);
-        attachEditorToCard(card);
+        attachEditorToCard(targetCard);
       } catch (error) {
-        attachEditorToCard(card);
+        attachEditorToCard(targetCard);
         document.getElementById("recipeEditPage").classList.add("active");
         document.getElementById("recipeName").value = fallbackRecipe.name;
         document.getElementById("recipeEditorStatus").textContent = `正在编辑：${fallbackRecipe.name}`;
