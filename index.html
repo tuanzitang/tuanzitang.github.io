@@ -1068,9 +1068,8 @@
       padding: 6px 10px;
     }
 
-    #mealPriorityChecks .chip {
-      padding: 5px 8px;
-      font-size: 12px;
+    .secondary-meal-field {
+      opacity: 0.9;
     }
 
     .likes-row {
@@ -1159,6 +1158,39 @@
       gap: 10px;
     }
 
+    .amount-tools {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .amount-tools label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .amount-tools input {
+      width: 56px;
+      min-height: 30px;
+      border: 1px solid rgba(116, 160, 196, 0.22);
+      border-radius: 8px;
+      padding: 4px 6px;
+      font: inherit;
+      background: #fff;
+    }
+
+    .amount-tools .button {
+      min-height: 30px;
+      padding: 5px 8px;
+      font-size: 12px;
+    }
+
     .editor-section-title h4 {
       margin: 0;
       font-size: 15px;
@@ -1227,9 +1259,37 @@
     }
 
     .meal-chip-row input {
-      width: 12px;
-      height: 12px;
+      appearance: none;
+      width: 9px;
+      height: 9px;
+      margin: 0;
+      border: 1px solid rgba(106, 154, 194, 0.52);
+      border-radius: 999px;
+      background: #fff;
       accent-color: #6a9ac2;
+    }
+
+    .meal-chip-row input:checked {
+      border-color: #6a9ac2;
+      background: radial-gradient(circle at center, #6a9ac2 0 45%, #fff 48%);
+    }
+
+    #mealPriorityChecks.meal-chip-row {
+      gap: 5px;
+    }
+
+    #mealPriorityChecks.meal-chip-row .chip {
+      min-height: 20px;
+      padding: 2px 6px;
+      gap: 5px;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid rgba(116, 160, 196, 0.12);
+      font-size: 11px;
+    }
+
+    #mealPriorityChecks.meal-chip-row .chip.is-best-meal {
+      display: none;
     }
 
     .like-pill {
@@ -2978,20 +3038,11 @@
           <section class="editor-section compact">
             <div class="editor-meta-grid">
               <div class="form-field">
-                <label>适合餐次优先级</label>
-                <div class="meal-chip-row" id="mealPriorityChecks">
-                  <label class="chip"><input type="checkbox" value="早餐"> 早餐</label>
-                  <label class="chip"><input type="checkbox" value="午餐"> 午餐</label>
-                  <label class="chip"><input type="checkbox" value="晚餐"> 晚餐</label>
-                  <label class="chip"><input type="checkbox" value="零食"> 零食</label>
-                </div>
-              </div>
-              <div class="form-field">
                 <label>家庭喜好</label>
                 <div class="likes-strip">
-                  <div class="like-pill"><label>成员 A</label><div class="star-rating" id="likeA" data-rating="3" aria-label="成员 A 喜好"></div></div>
-                  <div class="like-pill"><label>成员 B</label><div class="star-rating" id="likeB" data-rating="3" aria-label="成员 B 喜好"></div></div>
-                  <div class="like-pill"><label>成员 C</label><div class="star-rating" id="likeC" data-rating="3" aria-label="成员 C 喜好"></div></div>
+                  <div class="like-pill"><label>我</label><div class="star-rating" id="likeA" data-rating="3" aria-label="我 喜好"></div></div>
+                  <div class="like-pill"><label>娃</label><div class="star-rating" id="likeB" data-rating="3" aria-label="娃 喜好"></div></div>
+                  <div class="like-pill"><label>他</label><div class="star-rating" id="likeC" data-rating="3" aria-label="他 喜好"></div></div>
                 </div>
               </div>
               <div class="form-field">
@@ -3017,7 +3068,11 @@
           <section class="editor-section">
             <div class="editor-section-title">
               <h4>步骤和时间</h4>
-              <button class="button" id="toggleStepEditButton" type="button">✎ 编辑步骤</button>
+              <div class="amount-tools">
+                <label>用量 × <input id="amountMultiplierInput" type="number" min="0.1" step="0.1" value="1"></label>
+                <button class="button" id="applyAmountMultiplierButton" type="button">应用</button>
+                <button class="button" id="toggleStepEditButton" type="button">✎ 编辑步骤</button>
+              </div>
             </div>
             <div class="measure-table is-step-source" id="measureTable"></div>
             <div class="measure-table" id="stepTable"></div>
@@ -3127,7 +3182,7 @@
           mealPriority: ["晚餐", "午餐"],
           bestMeal: "晚餐",
           bestPeople: 2,
-          memberLikes: { "成员 A": 5, "成员 B": 4, "成员 C": 3 },
+          memberLikes: { "我": 5, "娃": 4, "他": 3 },
           requiredIngredients: ["牛肉", "番茄", "米饭"],
           recommendedIngredients: ["香菜"],
           servings: {
@@ -3149,7 +3204,7 @@
           mealPriority: ["午餐", "晚餐"],
           bestMeal: "午餐",
           bestPeople: 1,
-          memberLikes: { "成员 A": 3, "成员 B": 5, "成员 C": 3 },
+          memberLikes: { "我": 3, "娃": 5, "他": 3 },
           requiredIngredients: ["面条", "鸡蛋"],
           recommendedIngredients: ["青椒"],
           servings: {
@@ -3316,7 +3371,7 @@
           mealPriority,
           bestMeal: mealPriority[0],
           bestPeople: index % 3 === 0 ? 1 : index % 3 === 1 ? 2 : 3,
-          memberLikes: { "成员 A": 3, "成员 B": 3, "成员 C": 3 },
+          memberLikes: { "我": 3, "娃": 3, "他": 3 },
           requiredIngredients: [main],
           recommendedIngredients: ["葱", "蒜"],
           measurements: [
@@ -3343,7 +3398,7 @@
           mealPriority: ["晚餐", "午餐"],
           bestMeal: "晚餐",
           bestPeople: 2,
-          memberLikes: { "成员 A": 4, "成员 B": 4, "成员 C": 3 },
+          memberLikes: { "我": 4, "娃": 4, "他": 3 },
           requiredIngredients: ["牛肉", "番茄", "米饭"],
           recommendedIngredients: ["黑胡椒", "洋葱"],
           measurements: [
@@ -3365,7 +3420,7 @@
           mealPriority: ["晚餐"],
           bestMeal: "晚餐",
           bestPeople: 3,
-          memberLikes: { "成员 A": 4, "成员 B": 3, "成员 C": 5 },
+          memberLikes: { "我": 4, "娃": 3, "他": 5 },
           requiredIngredients: ["虾仁", "西兰花"],
           recommendedIngredients: ["蒜末", "黑胡椒"],
           measurements: [
@@ -3387,7 +3442,7 @@
           mealPriority: ["早餐", "零食"],
           bestMeal: "早餐",
           bestPeople: 1,
-          memberLikes: { "成员 A": 3, "成员 B": 5, "成员 C": 4 },
+          memberLikes: { "我": 3, "娃": 5, "他": 4 },
           requiredIngredients: ["燕麦", "酸奶"],
           recommendedIngredients: ["水果", "坚果"],
           measurements: [
@@ -3424,7 +3479,7 @@
         mealPriority,
         bestMeal,
         bestPeople,
-        memberLikes: { "成员 A": 3, "成员 B": 3, "成员 C": 3 },
+        memberLikes: defaultMemberLikes(),
         requiredIngredients,
         recommendedIngredients,
         measurements: measurements.map((item, index) => normalizeMeasurement({ stepIndex: Math.min(index, steps.length - 1), ...item })),
@@ -3923,6 +3978,20 @@
       showCookable: false
     };
 
+    const FAMILY_MEMBERS = [
+      { id: "likeA", name: "我", legacy: "成员 A" },
+      { id: "likeB", name: "娃", legacy: "成员 B" },
+      { id: "likeC", name: "他", legacy: "成员 C" }
+    ];
+
+    function defaultMemberLikes(value = 3) {
+      return Object.fromEntries(FAMILY_MEMBERS.map((member) => [member.name, value]));
+    }
+
+    function memberLikeValue(likes = {}, member) {
+      return likes[member.name] ?? likes[member.legacy] ?? 3;
+    }
+
     function markEditorDirty() {
       recipeEditorState.dirty = true;
     }
@@ -4178,6 +4247,35 @@
       }
     }
 
+    function scaleNumericValue(value, multiplier) {
+      const number = Number(value);
+      if (!Number.isFinite(number) || number <= 0) return value || "";
+      const scaled = Math.round(number * multiplier * 10) / 10;
+      return Number.isInteger(scaled) ? String(scaled) : String(scaled);
+    }
+
+    function applyAmountMultiplier() {
+      const input = document.getElementById("amountMultiplierInput");
+      const multiplier = Number(input.value);
+      if (!Number.isFinite(multiplier) || multiplier <= 0) {
+        input.focus();
+        return;
+      }
+      recipeEditorState.measurements = recipeEditorState.measurements.map((item) => {
+        const measure = normalizeMeasurement(item);
+        ["weightValue", "spoonValue", "nextWeightValue", "nextSpoonValue"].forEach((field) => {
+          if (measure[field]) {
+            measure[field] = scaleNumericValue(measure[field], multiplier);
+            markMeasureFieldChanged(measure, field);
+          }
+        });
+        return ensurePairedAmounts(measure);
+      });
+      markEditorDirty();
+      renderMeasurements();
+      renderSteps();
+    }
+
     function getRating(id) {
       return Number(document.getElementById(id).dataset.rating || 0);
     }
@@ -4205,8 +4303,8 @@
     }
 
     function renderStarRatings() {
-      ["likeA", "likeB", "likeC"].forEach((id) => {
-        const el = document.getElementById(id);
+      FAMILY_MEMBERS.forEach((member) => {
+        const el = document.getElementById(member.id);
         el.innerHTML = "";
         for (let index = 1; index <= 5; index += 1) {
           const button = document.createElement("button");
@@ -4214,10 +4312,10 @@
           button.type = "button";
           button.textContent = "★";
           button.setAttribute("aria-label", `${index} 星`);
-          button.addEventListener("click", () => { setRating(id, index); markEditorDirty(); });
+          button.addEventListener("click", () => { setRating(member.id, index); markEditorDirty(); });
           el.appendChild(button);
         }
-        setRating(id, Number(el.dataset.rating || 3));
+        setRating(member.id, Number(el.dataset.rating || 3));
       });
     }
 
@@ -4271,7 +4369,7 @@
       const minutes = recipeTotalMinutes(recipe);
       const ingredients = renderIngredientTag(recipe, inventory);
       const likes = recipe.memberLikes || {};
-      const likeText = ["成员 A", "成员 B", "成员 C"].map((name) => fiveStars(likes[name])).join(" / ");
+      const likeText = FAMILY_MEMBERS.map((member) => fiveStars(memberLikeValue(likes, member))).join(" / ");
       const level = freshnessLevel(recipe);
       const freshClass = level === "久" ? "fresh-high" : level === "中" ? "fresh-mid" : "fresh-low";
       const stockTag = canCookWithInventory(recipe, inventory) ? "库存匹配" : "缺少食材";
@@ -4280,7 +4378,7 @@
           <div class="recipe-summary recipe-body">
             <h4><span class="freshness-icon ${freshClass}">${level}</span> ${recipe.name || "未命名食谱"}</h4>
             <div class="meta-line recipe-meta-line">
-              <span>${joinList(recipe.mealPriority || []) || "未设置餐次"} · ${minutes || "未填"} 分钟 · ${recipe.status || "未尝试"}</span>
+              <span>最佳 ${bestMealForRecipe(recipe)} · ${bestPeopleForRecipe(recipe)} 人 · ${minutes || "未填"} 分钟 · ${recipe.status || "未尝试"}</span>
               <span class="recipe-stars"><span class="homepage-stars">${likeText}</span></span>
             </div>
             <div class="feedback">
@@ -4337,18 +4435,17 @@
     function renderHomeRecipeCard(recipe, inventory, people, meal) {
       const minutes = recipeTotalMinutes(recipe);
       const likes = recipe.memberLikes || {};
-      const likeText = ["成员 A", "成员 B", "成员 C"].map((name) => fiveStars(likes[name])).join(" / ");
+      const likeText = FAMILY_MEMBERS.map((member) => fiveStars(memberLikeValue(likes, member))).join(" / ");
       const level = freshnessLevel(recipe);
       const freshClass = level === "久" ? "fresh-high" : level === "中" ? "fresh-mid" : "fresh-low";
       const stockTag = canCookWithInventory(recipe, inventory) ? "库存匹配" : "缺少食材";
-      const priority = joinList(recipe.mealPriority || []) || `${meal}优先`;
       const bestInfo = `最佳 ${bestMealForRecipe(recipe)} · ${bestPeopleForRecipe(recipe)} 人`;
       return `
         <article class="recipe-card featured-recipe featured-recipe-details" data-recipe-id="${escapeAttr(recipe.id)}" data-recipe-name="${escapeAttr(recipe.name || "未命名食谱")}" tabindex="0">
           <div class="recipe-summary recipe-body">
             <h4><span class="freshness-icon ${freshClass}">${level}</span> ${escapeAttr(recipe.name || "未命名食谱")}</h4>
             <div class="meta-line recipe-meta-line">
-              <span>${escapeAttr(priority)} · ${minutes || "未填"} 分钟 · ${escapeAttr(lastCookedText(recipe))}</span>
+              <span>${escapeAttr(bestInfo)} · ${minutes || "未填"} 分钟 · ${escapeAttr(lastCookedText(recipe))}</span>
               <span class="recipe-stars"><span class="homepage-stars">${likeText}</span></span>
             </div>
             <div class="tags">
@@ -4729,7 +4826,7 @@
       if (servingAmount) return parseAmountValue(servingAmount);
       const measure = measurementForIngredient(recipe, ingredient);
       if (!measure) return { value: 0, unit: "" };
-      const multiplier = people / 2;
+      const multiplier = people / bestPeopleForRecipe(recipe);
       const value = Number(measure.nextWeightValue || measure.weightValue);
       const unit = measure.nextWeightUnit || measure.weightUnit || "个";
       if (!value) return { value: 0, unit };
@@ -4741,9 +4838,9 @@
       return `约 ${amount.value}${amount.unit || ""}`;
     }
 
-    function compactAmountText(measure, count = 1, people = 2) {
+    function compactAmountText(measure, count = 1, people = 2, basePeople = 2) {
       if (!measure) return "按菜谱用量";
-      const multiplier = count * (people / 2);
+      const multiplier = count * (people / basePeople);
       const value = Number(measure.nextWeightValue || measure.weightValue);
       const unit = measure.nextWeightUnit || measure.weightUnit || "个";
       const spoonValue = Number(measure.nextSpoonValue || measure.spoonValue);
@@ -4791,7 +4888,7 @@
         if (recipe) {
           const count = plannedCounts.get(recipe.name) || 1;
           const measure = measurementForIngredient(recipe, ingredient);
-          const amount = servingAmountText(recipe, ingredient, count, people) || compactAmountText(measure, count, people);
+          const amount = servingAmountText(recipe, ingredient, count, people) || compactAmountText(measure, count, people, bestPeopleForRecipe(recipe));
           if (isRequired) existing.requiredBy.push(recipe.name);
           else existing.optionalBy.push(recipe.name);
           existing.sources.push({
@@ -5766,6 +5863,12 @@
           if (event?.target?.closest?.("#recipeEditPage")) return;
           window.openFeaturedRecipeCard(card, event);
         });
+        card.addEventListener("dblclick", (event) => {
+          if (event?.target?.closest?.("#recipeEditPage")) return;
+          event.preventDefault();
+          if (recipeEditorState.activeCard === card) return;
+          window.openFeaturedRecipeCard(card, event);
+        });
         card.addEventListener("keydown", (event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
@@ -5780,6 +5883,11 @@
       document.body.classList.add("recipe-list-view");
       await renderRecipeLibrary();
       window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    async function openNewRecipeFromTop() {
+      await showRecipeLibraryPage();
+      await openNewRecipeEditorFromList();
     }
 
 
@@ -5819,13 +5927,17 @@
     }
 
     function getMealPriority() {
-      return [...document.querySelectorAll("#mealPriorityChecks input:checked")].map((input) => input.value);
+      return [...new Set([
+        getBestMeal(),
+        ...[...document.querySelectorAll("#mealPriorityChecks input:checked")].map((input) => input.value)
+      ])];
     }
 
     function setMealPriority(meals = []) {
       document.querySelectorAll("#mealPriorityChecks input").forEach((input) => {
         input.checked = meals.includes(input.value);
       });
+      syncBestMealVisibility();
     }
 
     function getRecipeStatus() {
@@ -5845,6 +5957,17 @@
     function setBestMeal(meal = "晚餐") {
       document.querySelectorAll("#bestMealOptions .chip").forEach((button) => {
         button.classList.toggle("active", button.dataset.bestMeal === meal);
+      });
+      syncBestMealVisibility();
+    }
+
+    function syncBestMealVisibility() {
+      const bestMeal = getBestMeal();
+      document.querySelectorAll("#mealPriorityChecks .chip").forEach((label) => {
+        const input = label.querySelector("input");
+        const isBest = input?.value === bestMeal;
+        label.classList.toggle("is-best-meal", isBest);
+        if (isBest) input.checked = false;
       });
     }
 
@@ -5867,11 +5990,7 @@
         mealPriority: getMealPriority(),
         bestMeal: getBestMeal(),
         bestPeople: getBestPeople(),
-        memberLikes: {
-          "成员 A": getRating("likeA"),
-          "成员 B": getRating("likeB"),
-          "成员 C": getRating("likeC")
-        },
+        memberLikes: Object.fromEntries(FAMILY_MEMBERS.map((member) => [member.name, getRating(member.id)])),
         requiredIngredients: measurements.filter((item) => item.kind === "必要").map((item) => item.ingredient),
         recommendedIngredients: measurements.filter((item) => item.kind === "推荐").map((item) => item.ingredient),
         measurements,
@@ -5893,9 +6012,7 @@
       setMealPriority(recipe.mealPriority || []);
       setBestMeal(bestMealForRecipe(recipe));
       setBestPeople(bestPeopleForRecipe(recipe));
-      setRating("likeA", ratingToNumber(recipe.memberLikes?.["成员 A"]));
-      setRating("likeB", ratingToNumber(recipe.memberLikes?.["成员 B"]));
-      setRating("likeC", ratingToNumber(recipe.memberLikes?.["成员 C"]));
+      FAMILY_MEMBERS.forEach((member) => setRating(member.id, ratingToNumber(memberLikeValue(recipe.memberLikes, member))));
       renderMeasurements();
       renderSteps();
       document.getElementById("recipeEditorStatus").textContent = `正在编辑：${recipe.name || "未命名食谱"}`;
@@ -6261,13 +6378,13 @@
         const row = document.createElement("details");
         row.className = "list-row";
         const likes = recipe.memberLikes || {};
-        const likeText = ["成员 A", "成员 B", "成员 C"].map((name) => `${name} <span class="homepage-stars">${fiveStars(likes[name])}</span>`).join("　");
+        const likeText = FAMILY_MEMBERS.map((member) => `${member.name} <span class="homepage-stars">${fiveStars(memberLikeValue(likes, member))}</span>`).join("　");
         const measures = (recipe.measurements || []).map(formatMeasure).slice(0, 3).join("；") || "还没有记录用量";
         row.innerHTML = `
           <summary>
             <div>
               <strong><span class="freshness-icon">${freshnessLevel(recipe)}</span> ${recipe.name}</strong>
-              <span class="tiny"><span class="mini-icon">●</span>${recipe.status || "未尝试"} · ${joinList(recipe.mealPriority)} · 最佳 ${bestMealForRecipe(recipe)} ${bestPeopleForRecipe(recipe)} 人</span>
+              <span class="tiny"><span class="mini-icon">●</span>${recipe.status || "未尝试"} · 最佳 ${bestMealForRecipe(recipe)} ${bestPeopleForRecipe(recipe)} 人</span>
             </div>
             <span class="tiny">展开</span>
           </summary>
@@ -6301,7 +6418,7 @@
         card.querySelector(".recipe-summary").innerHTML = `
           <h4><span class="freshness-icon fresh-high">久</span> ${recipe.name || "未命名食谱"}</h4>
           <div class="meta-line recipe-meta-line">
-            <span>${joinList(recipe.mealPriority || []) || "未设置餐次"} · ${minutes || "未填"} 分钟 · ${recipe.status || "未尝试"}</span>
+            <span>最佳 ${bestMealForRecipe(recipe)} · ${bestPeopleForRecipe(recipe)} 人 · ${minutes || "未填"} 分钟 · ${recipe.status || "未尝试"}</span>
             <span class="recipe-stars"><span class="homepage-stars">★★★☆☆ / ★★★☆☆ / ★★★☆☆</span></span>
           </div>
           <div class="feedback"></div>
@@ -6377,7 +6494,7 @@
             mealPriority: recipe.mealPriority || ["晚餐"],
             bestMeal: recipe.bestMeal || recipe.mealPriority?.[0] || "晚餐",
             bestPeople: Number(recipe.bestPeople || 2),
-            memberLikes: recipe.memberLikes || { "成员 A": 3, "成员 B": 3, "成员 C": 3 },
+            memberLikes: recipe.memberLikes || defaultMemberLikes(),
             requiredIngredients: recipe.requiredIngredients || [],
             recommendedIngredients: recipe.recommendedIngredients || [],
             measurements: (recipe.measurements || [
@@ -6404,7 +6521,7 @@
           mealPriority: ["晚餐"],
           bestMeal: "晚餐",
           bestPeople: 2,
-          memberLikes: { "成员 A": 3, "成员 B": 3, "成员 C": 3 },
+          memberLikes: defaultMemberLikes(),
           requiredIngredients,
           recommendedIngredients,
           measurements: [
@@ -6533,11 +6650,8 @@
       });
       document.getElementById("recipeName").addEventListener("input", markEditorDirty);
       document.querySelectorAll("#mealPriorityChecks input").forEach((input) => input.addEventListener("change", markEditorDirty));
-      document.getElementById("newRecipeTopButton").addEventListener("click", () => {
-        document.getElementById("recipeEditor").open = true;
-        newRecipe();
-      });
-      document.getElementById("newRecipeButton").addEventListener("click", newRecipe);
+      document.getElementById("newRecipeTopButton").addEventListener("click", () => openNewRecipeFromTop().catch(showStorageError));
+      document.getElementById("newRecipeButton").addEventListener("click", () => openNewRecipeEditorFromList().catch(showStorageError));
       document.getElementById("openBulkImportButton").addEventListener("click", () => document.getElementById("bulkImportText").focus());
       document.getElementById("recipeEditPage").addEventListener("click", (event) => event.stopPropagation());
       document.getElementById("closeRecipeEditorButton").addEventListener("click", () => closeActiveRecipeCard());
@@ -6553,6 +6667,7 @@
       document.getElementById("saveRecipeButton").addEventListener("click", () => saveCurrentRecipe().catch(showStorageError));
       document.getElementById("markUntestedButton").addEventListener("click", () => markCurrentUntested().catch(showStorageError));
       document.getElementById("bulkImportButton").addEventListener("click", () => bulkImportRecipes().catch(showStorageError));
+      document.getElementById("applyAmountMultiplierButton").addEventListener("click", applyAmountMultiplier);
       document.getElementById("toggleStepEditButton").addEventListener("click", () => {
         recipeEditorState.stepEditMode = !recipeEditorState.stepEditMode;
         renderSteps();
@@ -6600,7 +6715,7 @@
         name: card.dataset.recipeName || "未命名食谱",
         status: "未尝试",
         mealPriority: ["晚餐"],
-        memberLikes: { "成员 A": 3, "成员 B": 3, "成员 C": 3 },
+        memberLikes: defaultMemberLikes(),
         requiredIngredients: [],
         recommendedIngredients: [],
         measurements: [],
