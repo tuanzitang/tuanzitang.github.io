@@ -3998,6 +3998,12 @@
       recipeEditorState.dirty = true;
     }
 
+    function isEnterSubmit(event) {
+      if (event.key !== "Enter" || event.shiftKey || event.isComposing) return false;
+      const target = event.target;
+      return !target?.closest?.("textarea, button, select");
+    }
+
     function attachEditorToCard(card) {
       const editor = document.getElementById("recipeEditPage");
       card.appendChild(editor);
@@ -4769,6 +4775,11 @@
       });
       card.querySelector(".inventory-save-button").addEventListener("click", () => saveInventoryEdit(card, item).catch(showStorageError));
       card.querySelector(".inventory-cancel-button").addEventListener("click", () => renderInventoryLibrary().catch(showStorageError));
+      card.addEventListener("keydown", (event) => {
+        if (!isEnterSubmit(event)) return;
+        event.preventDefault();
+        saveInventoryEdit(card, item).catch(showStorageError);
+      });
       card.querySelector(".inventory-edit-name").focus();
     }
 
@@ -4788,10 +4799,11 @@
         expiresAt: card.querySelector(".inventory-edit-expires-at").value || null,
         pantry: card.querySelector(".inventory-edit-storage").value === "常温"
       };
-      await saveRecords("inventory", [updated]);
+      const result = await saveInventoryWithConflict(updated, { exceptId: original.id, deleteIncomingId: original.id });
+      if (result.mode === "cancelled") return;
       await renderInventoryLibrary();
       await renderHomeRecommendations();
-      await updateStorageStatus(`已更新食材“${updated.name}”。`);
+      await updateStorageStatus(result.mode === "merged" ? `已把“${updated.name}”合并到现有库存。` : `已更新食材“${updated.name}”。`);
     }
 
     async function deleteInventoryItem(id) {
@@ -5143,27 +5155,90 @@
       return new Date(second) > new Date(first) ? second : first;
     }
 
+    function findInventoryConflict(inventory = [], name = "", exceptId = "") {
+      const normalizedName = String(name || "").trim();
+      if (!normalizedName) return null;
+      return inventory.find((entry) => entry.id !== exceptId && String(entry.name || "").trim() === normalizedName) || null;
+    }
+
+    function mergeInventoryEntry(existing = {}, incoming = {}) {
+      const sameUnit = (existing.unit || "个") === (incoming.unit || "个");
+      const existingQuantity = Number(existing.quantity) || 0;
+      const incomingQuantity = Number(incoming.quantity) || 0;
+      return {
+        ...existing,
+        quantity: sameUnit ? existingQuantity + incomingQuantity : incomingQuantity || existingQuantity,
+        unit: sameUnit ? (existing.unit || incoming.unit || "个") : (incoming.unit || existing.unit || "个"),
+        type: incoming.type || existing.type,
+        storage: incoming.storage || existing.storage,
+        expiresAt: laterDateValue(existing.expiresAt, incoming.expiresAt),
+        pantry: (incoming.storage || existing.storage) === "常温"
+      };
+    }
+
+    function showInventoryConflictDialog(existing = {}, incoming = {}) {
+      return new Promise((resolve) => {
+        const sameUnit = (existing.unit || "个") === (incoming.unit || "个");
+        const unitNote = sameUnit ? "单位相同，合并会把数量加在一起。" : "单位不同，合并会保留这次填写的单位和数量。";
+        const backdrop = document.createElement("div");
+        backdrop.className = "confirm-backdrop";
+        backdrop.innerHTML = `
+          <div class="confirm-panel" role="dialog" aria-modal="true" aria-label="食材名称冲突">
+            <h4>已有同名食材</h4>
+            <p>库存里已经有“${escapeAttr(incoming.name)}”：${escapeAttr(existing.quantity ?? "-")}${escapeAttr(existing.unit || "")}，${expiryText(existing)}。${unitNote}</p>
+            <div class="confirm-actions">
+              <button class="button" type="button" data-action="cancel">取消</button>
+              <button class="button" type="button" data-action="new">保存两条</button>
+              <button class="button primary" type="button" data-action="merge">合并到已有</button>
+            </div>
+          </div>
+        `;
+        const finish = (action) => {
+          backdrop.remove();
+          resolve(action);
+        };
+        backdrop.addEventListener("click", (event) => {
+          if (event.target === backdrop) finish("cancel");
+        });
+        backdrop.querySelectorAll("button").forEach((button) => {
+          button.addEventListener("click", () => finish(button.dataset.action));
+        });
+        document.body.appendChild(backdrop);
+        backdrop.querySelector('[data-action="merge"]').focus();
+      });
+    }
+
+    async function saveInventoryWithConflict(incoming, options = {}) {
+      const inventory = await getAll("inventory");
+      const existing = findInventoryConflict(inventory, incoming.name, options.exceptId || incoming.id);
+      if (!existing) {
+        await saveRecords("inventory", [incoming]);
+        return { item: incoming, mode: "saved" };
+      }
+      const action = await showInventoryConflictDialog(existing, incoming);
+      if (action === "cancel") return { item: incoming, mode: "cancelled" };
+      if (action === "merge") {
+        const merged = mergeInventoryEntry(existing, incoming);
+        await saveRecords("inventory", [merged]);
+        if (options.deleteIncomingId && options.deleteIncomingId !== existing.id) {
+          await deleteRecord("inventory", options.deleteIncomingId);
+        }
+        return { item: merged, mode: "merged" };
+      }
+      await saveRecords("inventory", [incoming]);
+      return { item: incoming, mode: "saved_duplicate" };
+    }
+
     async function saveBoughtInventoryItem(item, mergeMode) {
       const inventory = await getAll("inventory");
-      const existing = inventory.find((entry) => (entry.name || "").trim() === item.name);
+      const existing = findInventoryConflict(inventory, item.name);
       if (mergeMode === "merge" && existing) {
-        const sameUnit = (existing.unit || "个") === (item.unit || "个");
-        const existingQuantity = Number(existing.quantity) || 0;
-        const addedQuantity = Number(item.quantity) || 0;
-        const merged = {
-          ...existing,
-          quantity: sameUnit ? existingQuantity + addedQuantity : addedQuantity,
-          unit: item.unit,
-          type: item.type,
-          storage: item.storage,
-          expiresAt: laterDateValue(existing.expiresAt, item.expiresAt),
-          pantry: item.storage === "常温"
-        };
+        const merged = mergeInventoryEntry(existing, item);
         await saveRecords("inventory", [merged]);
         return { item: merged, merged: true };
       }
-      await saveRecords("inventory", [item]);
-      return { item, merged: false };
+      const result = await saveInventoryWithConflict(item);
+      return { item: result.item, merged: result.mode === "merged", cancelled: result.mode === "cancelled" };
     }
 
     async function markShoppingBought(button) {
@@ -5246,6 +5321,7 @@
           pantry: selectedStorage === "常温"
         };
         const result = await saveBoughtInventoryItem(item, mergeMode);
+        if (result.cancelled) return;
         backdrop.remove();
         await renderShoppingList();
         await renderInventoryLibrary();
@@ -5890,7 +5966,8 @@
         expiresAt: document.getElementById("quickInventoryExpiresAt").value || dateFromDays(document.getElementById("quickInventoryExpireDays").value) || null,
         pantry: document.getElementById("quickInventoryStorage").value === "常温"
       };
-      await saveRecords("inventory", [item]);
+      const result = await saveInventoryWithConflict(item);
+      if (result.mode === "cancelled") return;
       ["quickInventoryName", "quickInventoryQuantity", "quickInventoryExpiresAt", "quickInventoryExpireDays"].forEach((id) => {
         document.getElementById(id).value = "";
       });
@@ -5898,7 +5975,22 @@
       document.getElementById("quickInventoryExpireDays").value = "0";
       await renderInventoryLibrary();
       await renderHomeRecommendations();
-      await updateStorageStatus(`已添加食材“${item.name}”。`);
+      await updateStorageStatus(result.mode === "merged" ? `已把“${item.name}”合并到现有库存。` : `已添加食材“${item.name}”。`);
+    }
+
+    function addEditorStepFromFields() {
+      const text = document.getElementById("stepText").value.trim();
+      if (!text) return false;
+      recipeEditorState.steps.push({
+        text,
+        minutes: Number(document.getElementById("stepMinutes").value) || 0,
+        prepareAhead: false
+      });
+      document.getElementById("stepText").value = "";
+      document.getElementById("stepMinutes").value = "";
+      markEditorDirty();
+      renderSteps();
+      return true;
     }
 
     async function openNewRecipeEditorFromList() {
@@ -6761,18 +6853,17 @@
         recipeEditorState.stepEditMode = !recipeEditorState.stepEditMode;
         renderSteps();
       });
-      document.getElementById("addStepButton").addEventListener("click", () => {
-        const text = document.getElementById("stepText").value.trim();
-        if (!text) return;
-        recipeEditorState.steps.push({
-          text,
-          minutes: Number(document.getElementById("stepMinutes").value) || 0,
-          prepareAhead: false
-        });
-        markEditorDirty();
-        document.getElementById("stepText").value = "";
-        document.getElementById("stepMinutes").value = "";
-        renderSteps();
+      document.getElementById("addStepButton").addEventListener("click", addEditorStepFromFields);
+      document.getElementById("recipeEditPage").addEventListener("keydown", (event) => {
+        if (!isEnterSubmit(event)) return;
+        event.preventDefault();
+        if (event.target.closest("#stepEditorFields") && addEditorStepFromFields()) return;
+        saveCurrentRecipe().catch(showStorageError);
+      });
+      document.getElementById("quickInventoryPanel").addEventListener("keydown", (event) => {
+        if (!isEnterSubmit(event)) return;
+        event.preventDefault();
+        addInventoryItem().catch(showStorageError);
       });
       document.querySelectorAll(".featured-recipe-details").forEach((card) => {
         const openCardRecipe = (event) => {
