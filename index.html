@@ -2523,6 +2523,40 @@
       background: #f4f9fd;
     }
 
+    .undo-bar {
+      position: fixed;
+      z-index: 50;
+      top: 12px;
+      left: 50%;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      width: min(calc(100% - 28px), 520px);
+      padding: 10px 12px 10px 16px;
+      border: 1px solid rgba(95, 139, 177, 0.26);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.97);
+      box-shadow: 0 14px 34px rgba(43, 73, 96, 0.18);
+      transform: translateX(-50%);
+    }
+
+    .undo-bar.is-visible {
+      display: flex;
+    }
+
+    .undo-bar-message {
+      min-width: 0;
+      flex: 1;
+      color: #516b7e;
+      font-size: 13px;
+    }
+
+    .undo-bar .button {
+      min-height: 30px;
+      padding: 5px 10px;
+      white-space: nowrap;
+    }
+
     .quick-add-panel {
       display: none;
       grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
@@ -3080,6 +3114,31 @@
       .preview {
         padding: 10px;
       }
+
+      .recipe-list-tools {
+        grid-template-columns: minmax(0, 1fr) auto 82px 76px;
+        gap: 6px;
+        padding: 8px;
+      }
+
+      .recipe-list-tools input,
+      .recipe-list-tools select,
+      .multi-select-filter summary {
+        min-height: 34px;
+        padding: 6px 7px;
+        font-size: 12px;
+      }
+
+      .multi-select-filter {
+        min-width: 82px;
+      }
+
+      .filter-check {
+        min-height: 34px;
+        padding: 6px 7px;
+        gap: 4px;
+        font-size: 12px;
+      }
     }
 
     @media (max-width: 560px) {
@@ -3106,6 +3165,10 @@
         <span class="backup-status" id="backupStatus">上次备份：正在读取</span>
       </div>
     </header>
+    <div class="undo-bar" id="undoBar" role="status" aria-live="polite">
+      <span class="undo-bar-message" id="undoBarMessage"></span>
+      <button class="button" id="undoDeleteButton" type="button">撤销</button>
+    </div>
     <section class="storage-panel sr-only" aria-live="polite">
       <p id="storageStatus">正在准备本地食谱库。</p>
       <button id="saveSampleData" type="button">保存示例数据</button>
@@ -3634,6 +3697,16 @@
       }));
     }
 
+    function getRecord(storeName, id) {
+      return openDatabase().then((db) => new Promise((resolve, reject) => {
+        const transaction = db.transaction(storeName, "readonly");
+        const request = transaction.objectStore(storeName).get(id);
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+        transaction.oncomplete = () => db.close();
+      }));
+    }
+
     async function saveRecords(storeName, records) {
       await runStore(storeName, "readwrite", (store) => {
         records.forEach((record) => store.put(record));
@@ -3651,6 +3724,34 @@
       await runStore(storeName, "readwrite", (store) => {
         store.delete(id);
       });
+      if (await getRecord(storeName, id)) {
+        throw new Error("删除没有写入本机数据库，请重试。");
+      }
+    }
+
+    let pendingUndoAction = null;
+    let pendingUndoTimer = null;
+
+    function clearUndoBar() {
+      clearTimeout(pendingUndoTimer);
+      pendingUndoTimer = null;
+      pendingUndoAction = null;
+      document.getElementById("undoBar")?.classList.remove("is-visible");
+    }
+
+    function offerUndo(message, action) {
+      clearUndoBar();
+      pendingUndoAction = action;
+      document.getElementById("undoBarMessage").textContent = message;
+      document.getElementById("undoBar").classList.add("is-visible");
+      pendingUndoTimer = setTimeout(clearUndoBar, 10000);
+    }
+
+    async function undoLatestDeletion() {
+      const action = pendingUndoAction;
+      if (!action) return;
+      clearUndoBar();
+      await action();
     }
 
     async function readBackup() {
@@ -4783,8 +4884,45 @@
 
     function canCookWithInventory(recipe, inventory) {
       const stock = new Set((inventory || []).map((item) => item.name));
-      const required = (recipe.requiredIngredients || recipeIngredients(recipe)).filter(Boolean);
+      // 只有标为“必要”的食材才会影响“可做”判断；推荐食材不阻塞下厨。
+      const required = (recipe.requiredIngredients || []).filter(Boolean);
       return required.length === 0 || required.every((ingredient) => stock.has(ingredient));
+    }
+
+    function assertRegression(condition, message) {
+      if (!condition) throw new Error(message);
+    }
+
+    async function runRegressionChecks() {
+      const optionalIngredientRecipe = {
+        requiredIngredients: ["鸡蛋"],
+        recommendedIngredients: ["香菜"]
+      };
+      assertRegression(
+        canCookWithInventory(optionalIngredientRecipe, [{ name: "鸡蛋" }]),
+        "可选食材不应阻止“可做”判断"
+      );
+      assertRegression(
+        !canCookWithInventory(optionalIngredientRecipe, [{ name: "香菜" }]),
+        "缺少必要食材时不应显示为可做"
+      );
+      assertRegression(
+        canCookWithInventory({ requiredIngredients: [], recommendedIngredients: ["香菜"] }, []),
+        "只有推荐食材的食谱应显示为可做"
+      );
+
+      const testId = `__recipe-delete-test-${Date.now()}`;
+      try {
+        await saveRecords("recipes", [{ id: testId, name: "删除校验临时食谱" }]);
+        assertRegression(await getRecord("recipes", testId), "临时食谱未能写入数据库");
+        await deleteRecord("recipes", testId);
+        assertRegression(!(await getRecord("recipes", testId)), "食谱删除后仍留在数据库中");
+        await saveRecords("recipes", [{ id: testId, name: "删除校验临时食谱" }]);
+        assertRegression(await getRecord("recipes", testId), "撤销删除时未能恢复食谱");
+      } finally {
+        await deleteRecord("recipes", testId);
+      }
+      return ["可做筛选", "必要食材检查", "删除持久化", "撤销恢复"];
     }
 
     function renderIngredientTag(recipe, inventory) {
@@ -5031,6 +5169,8 @@
       const recipe = recipes.find((item) => item.id === id);
       if (!recipe) return;
       if (!confirm(`确定删除食谱“${recipe.name}”吗？本机食谱库和菜单里的同名安排都会移除。`)) return;
+      const recipeBackup = cloneData(recipe);
+      const plansBackup = cloneData(await getAll("plans"));
       if (recipeEditorState.activeCard?.dataset.recipeId === id) {
         restoreRecipeEditorHome();
         recipeEditorState.activeCard.classList.remove("is-editing");
@@ -5053,7 +5193,16 @@
       await renderHomeRecommendations();
       await renderShoppingList();
       await renderReminderList();
-      await updateStorageStatus(`已删除食谱“${recipe.name}”。`);
+      await updateStorageStatus(`已删除食谱“${recipe.name}”。可在顶部撤销。`);
+      offerUndo(`已删除“${recipe.name}”。`, async () => {
+        await saveRecords("recipes", [recipeBackup]);
+        await replaceRecords("plans", plansBackup);
+        await renderRecipeLibrary();
+        await renderHomeRecommendations();
+        await renderShoppingList();
+        await renderReminderList();
+        await updateStorageStatus(`已恢复食谱“${recipe.name}”。`);
+      });
     }
 
     function inferInventoryType(item = {}) {
@@ -5271,10 +5420,19 @@
       const item = inventory.find((entry) => entry.id === id);
       if (!item) return;
       if (!confirm(`确定删除食材“${item.name}”吗？删除后会从本机库存移除。`)) return;
+      const itemBackup = cloneData(item);
       await deleteRecord("inventory", id);
       await renderInventoryLibrary();
       await renderHomeRecommendations();
-      await updateStorageStatus(`已删除食材“${item.name}”。`);
+      await renderRecipeLibrary();
+      await updateStorageStatus(`已删除食材“${item.name}”。可在顶部撤销。`);
+      offerUndo(`已删除“${item.name}”。`, async () => {
+        await saveRecords("inventory", [itemBackup]);
+        await renderInventoryLibrary();
+        await renderRecipeLibrary();
+        await renderHomeRecommendations();
+        await updateStorageStatus(`已恢复食材“${item.name}”。`);
+      });
     }
 
     async function duplicateInventoryItem(id) {
@@ -6027,8 +6185,19 @@
         button.dataset.bound = "true";
         button.addEventListener("click", (event) => {
           event.stopPropagation();
-          setMealDish(meal, "", "已决定", Number(button.dataset.slot));
-          saveWeekPlanner().catch(showStorageError);
+          (async () => {
+            const plansBackup = cloneData(await getAll("plans"));
+            const dishName = mealDishes(meal)[Number(button.dataset.slot)] || "这道菜";
+            setMealDish(meal, "", "已决定", Number(button.dataset.slot));
+            await saveWeekPlanner();
+            offerUndo(`已从菜单移除“${dishName}”。`, async () => {
+              await replaceRecords("plans", plansBackup);
+              await applySavedMealPlan();
+              await renderShoppingList();
+              await renderReminderList();
+              await updateStorageStatus(`已恢复“${dishName}”到菜单。`);
+            });
+          })().catch(showStorageError);
         });
       });
     }
@@ -7002,6 +7171,8 @@
         });
         row.querySelector(".step-delete-button")?.addEventListener("click", () => {
           if (recipeEditorState.stepEditMode) {
+            const stepsBackup = cloneData(recipeEditorState.steps);
+            const measurementsBackup = cloneData(recipeEditorState.measurements);
             recipeEditorState.steps.splice(index, 1);
             recipeEditorState.measurements.forEach((measure) => {
               if (measure.stepIndex === index) measure.stepIndex = Math.max(0, index - 1);
@@ -7009,6 +7180,12 @@
             });
             markEditorDirty();
             renderSteps();
+            offerUndo(`已删除${stepLabel(index)}。`, async () => {
+              recipeEditorState.steps = stepsBackup;
+              recipeEditorState.measurements = measurementsBackup;
+              markEditorDirty();
+              renderMeasurements();
+            });
           }
         });
         row.querySelector(".step-add-toggle-button")?.addEventListener("click", () => {
@@ -7246,6 +7423,7 @@
 
     function bindRecipeEditor() {
       renderStarRatings();
+      document.getElementById("undoDeleteButton").addEventListener("click", () => undoLatestDeletion().catch(showStorageError));
       const libraryEntry = document.getElementById("recipeLibraryEntry");
       libraryEntry.addEventListener("click", () => showRecipeLibraryPage().catch(showStorageError));
       libraryEntry.addEventListener("keydown", (event) => {
@@ -7446,6 +7624,10 @@
           await saveSampleData();
         } else {
           await updateStorageStatus();
+        }
+        if (new URLSearchParams(window.location.search).has("test")) {
+          window.__recipeAppTestResults = await runRegressionChecks();
+          await updateStorageStatus(`回归检查通过：${window.__recipeAppTestResults.join("、")}。`);
         }
         const importedCount = await ensureWebSimpleRecipes();
         await renderBackupStatus();
