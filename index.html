@@ -1492,9 +1492,9 @@
 
     .browse-step-head {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: 18px minmax(0, 1fr) max-content;
       align-items: baseline;
-      gap: 10px;
+      gap: 7px;
       margin-bottom: 6px;
     }
 
@@ -1515,6 +1515,12 @@
       color: var(--muted);
       font-size: 12px;
       font-weight: 400;
+    }
+
+    .browse-step-head > :last-child {
+      justify-self: end;
+      width: max-content;
+      white-space: nowrap;
     }
 
     .browse-materials {
@@ -1826,7 +1832,7 @@
 
     .step-material-row {
       display: grid;
-      grid-template-columns: minmax(110px, 1fr) minmax(140px, auto) minmax(190px, auto);
+      grid-template-columns: minmax(110px, 1fr) minmax(140px, auto) minmax(190px, auto) 28px;
       gap: 6px;
       align-items: center;
       color: var(--muted);
@@ -1882,6 +1888,26 @@
     .step-material-row .current-cell,
     .step-material-row .next-cell {
       min-height: 30px;
+    }
+
+    .step-material-delete-button {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      padding: 0;
+      border: 0;
+      border-radius: 7px;
+      background: transparent;
+      color: #8b9aa6;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .step-material-delete-button:hover {
+      background: #f8efed;
+      color: #a55f57;
     }
 
     .step-next-edit input,
@@ -3075,7 +3101,7 @@
       }
 
       .step-material-row {
-        grid-template-columns: repeat(3, minmax(120px, 1fr));
+        grid-template-columns: minmax(110px, 1fr) minmax(116px, auto) minmax(174px, auto) 28px;
         overflow-x: auto;
       }
     }
@@ -7025,6 +7051,7 @@
               </select>
               <small>${nextPair}</small>
             </span>
+            ${recipeEditorState.stepEditMode ? `<button class="step-material-delete-button" type="button" data-material-index="${index}" title="删除食材" aria-label="删除${escapeAttr(measure.ingredient || "食材")}">×</button>` : ""}
           </div>
         `;
       }).join("");
@@ -7167,6 +7194,21 @@
             syncPairedAmount(measure, control.dataset.field);
             markEditorDirty();
             control.closest(".step-next-edit").querySelector("small").innerHTML = amountPairText(normalizeMeasurement(measure), "next");
+          });
+        });
+        row.querySelectorAll(".step-material-delete-button").forEach((button) => {
+          button.addEventListener("click", () => {
+            const materialIndex = Number(button.dataset.materialIndex);
+            const removed = recipeEditorState.measurements[materialIndex];
+            if (!removed) return;
+            recipeEditorState.measurements.splice(materialIndex, 1);
+            markEditorDirty();
+            renderMeasurements();
+            offerUndo(`已删除食材“${removed.ingredient || "未命名食材"}”。`, async () => {
+              recipeEditorState.measurements.splice(materialIndex, 0, removed);
+              markEditorDirty();
+              renderMeasurements();
+            });
           });
         });
         row.querySelector(".step-delete-button")?.addEventListener("click", () => {
