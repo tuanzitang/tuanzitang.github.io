@@ -3801,6 +3801,25 @@
       await saveRecords("settings", [record]);
     }
 
+    async function getDeletedRecipeIds() {
+      const record = await getSetting("deleted-recipes");
+      return Array.isArray(record?.ids) ? record.ids : [];
+    }
+
+    async function markRecipeDeleted(id) {
+      if (!id) return;
+      const ids = new Set(await getDeletedRecipeIds());
+      ids.add(id);
+      await saveSetting({ id: "deleted-recipes", ids: [...ids] });
+      await saveSetting({ id: "seed-meta", initializedAt: new Date().toISOString() });
+    }
+
+    async function unmarkRecipeDeleted(id) {
+      if (!id) return;
+      const ids = (await getDeletedRecipeIds()).filter((item) => item !== id);
+      await saveSetting({ id: "deleted-recipes", ids });
+    }
+
     function backupTimeText(value) {
       if (!value) return { text: "上次备份：从未", warn: true };
       const date = new Date(value);
@@ -4334,6 +4353,7 @@
 
     async function ensureWebSimpleRecipes() {
       const existing = await getAll("recipes");
+      const deletedIds = new Set(await getDeletedRecipeIds());
       const eggplantRecipes = existing.filter((recipe) => [
         recipe.name,
         ...(recipe.requiredIngredients || []),
@@ -4343,7 +4363,7 @@
         await deleteRecord("recipes", recipe.id);
       }
       const existingIds = new Set(existing.map((recipe) => recipe.id));
-      const allImports = buildWebSimpleRecipes();
+      const allImports = buildWebSimpleRecipes().filter((recipe) => !deletedIds.has(recipe.id));
       const generatedUpdates = allImports.filter((recipe) => recipe.id.startsWith("web-generated-simple-"));
       const curatedMissing = allImports.filter((recipe) => !recipe.id.startsWith("web-generated-simple-") && !existingIds.has(recipe.id));
       const imports = [...generatedUpdates, ...curatedMissing];
@@ -4358,6 +4378,7 @@
       for (const storeName of STORES) {
         await saveRecords(storeName, sampleData[storeName]);
       }
+      await saveSetting({ id: "seed-meta", initializedAt: new Date().toISOString() });
       await renderBackupStatus();
       await renderHomeRecommendations();
       await updateStorageStatus("示例数据已保存到本机浏览器。");
@@ -5202,6 +5223,7 @@
         recipeEditorState.activeCard.classList.remove("is-editing");
         recipeEditorState.activeCard = null;
       }
+      await markRecipeDeleted(id);
       await deleteRecord("recipes", id);
       const plans = await getAll("plans");
       const updatedPlans = plans.map((plan) => {
@@ -5221,6 +5243,7 @@
       await renderReminderList();
       await updateStorageStatus(`已删除食谱“${recipe.name}”。可在顶部撤销。`);
       offerUndo(`已删除“${recipe.name}”。`, async () => {
+        await unmarkRecipeDeleted(id);
         await saveRecords("recipes", [recipeBackup]);
         await replaceRecords("plans", plansBackup);
         await renderRecipeLibrary();
@@ -7662,7 +7685,8 @@
       try {
         await openDatabase();
         const existingRecipes = await getAll("recipes");
-        if (existingRecipes.length === 0) {
+        const seedMeta = await getSetting("seed-meta");
+        if (existingRecipes.length === 0 && !seedMeta) {
           await saveSampleData();
         } else {
           await updateStorageStatus();
