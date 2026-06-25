@@ -4416,8 +4416,17 @@
       for (const storeName of STORES) {
         await replaceRecords(storeName, Array.isArray(backup.data[storeName]) ? backup.data[storeName] : []);
       }
+      await saveSetting({ id: "seed-meta", initializedAt: new Date().toISOString(), source: "backup-import" });
+      await saveSetting({ id: "recipe-import-mode", mode: "user", importedAt: new Date().toISOString() });
       await renderBackupStatus();
+      await renderEditableRecipes();
+      await renderRecipeLibrary();
       await renderHomeRecommendations();
+      await renderInventoryLibrary();
+      await renderShoppingList();
+      await renderReminderList();
+      await applySavedMealPlan();
+      enhanceWeekPlanner();
       await updateStorageStatus(`备份已导入：${incomingCounts.recipes} 个食谱、${incomingCounts.inventory} 个食材、${incomingCounts.plans} 个周计划。`);
     }
 
@@ -7695,7 +7704,8 @@
           window.__recipeAppTestResults = await runRegressionChecks();
           await updateStorageStatus(`回归检查通过：${window.__recipeAppTestResults.join("、")}。`);
         }
-        const importedCount = await ensureWebSimpleRecipes();
+        const importMode = await getSetting("recipe-import-mode");
+        const importedCount = importMode?.mode === "user" ? 0 : await ensureWebSimpleRecipes();
         await renderBackupStatus();
         await renderEditableRecipes();
         await renderRecipeLibrary();
